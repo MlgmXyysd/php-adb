@@ -25,11 +25,14 @@ declare(strict_types=1);
 
 namespace MeowMobile;
 
+/**
+ * MeowMobile/ADB
+ */
 class ADB {
 
-    const BIN_LINUX = "adb";
-    const BIN_DARWIN = "adb-darwin";
-    const BIN_WINDOWS = "adb.exe";
+    private const BIN_LINUX = "adb";
+    private const BIN_DARWIN = "adb-darwin";
+    private const BIN_WINDOWS = "adb.exe";
 
     public const CONNECT_TYPE_DEVICE = "device";
     public const CONNECT_TYPE_UNAUTHORIZED = "unauthorized";
@@ -134,12 +137,12 @@ class ADB {
     }
 
     public function setScreenSize($size = "reset", $device = "", $transport = false) {
-        return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell wm size " . $size));
+        return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell wm size " . $size);
     }
 
     public function getScreenSize($device = "", $transport = false) {
-        $output = self::runAdb(self::getDeviceId($device, $transport) . "shell wm size");
-        return self::judgeOutput($output) ? array(str_replace("Physical size: ", "", $output[0][0]), isset($output[0][1]) ? str_replace("Override size: ", "", $output[0][1]) : $physical) : false;
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell wm size");
+        return self::judgeOutput($o) ? array(str_replace("Physical size: ", "", $o[0][0]), isset($output[0][1]) ? str_replace("Override size: ", "", $o[0][1]) : $physical) : false;
     }
 
     public function setScreenDensity($size = "reset", $device = "", $transport = false) {
@@ -147,34 +150,35 @@ class ADB {
     }
 
     public function getScreenDensity($device = "", $transport = false) {
-        $output = self::runAdb(self::getDeviceId($device, $transport) . "shell wm density");
-        return self::judgeOutput($output) ? array(str_replace("Physical density: ", "", $output[0][0]), isset($output[0][1]) ? str_replace("Override density: ", "", $output[0][1]) : $physical) : false;
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell wm density");
+        return self::judgeOutput($o) ? array(str_replace("Physical density: ", "", $o[0][0]), isset($o[0][1]) ? str_replace("Override density: ", "", $o[0][1]) : $physical) : false;
     }
 
     public function getScreenshotPNG($device = "", $transport = false) {
-        $output = self::runAdb(self::getDeviceId($device, $transport) . "exec-out screencap -p", true);
-        return self::judgeOutput($output) ? $output[0] : false;
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "exec-out screencap -p", true);
+        return self::judgeOutput($o) ? $o[0] : false;
     }
 
     public function getPackage($package, $device = "", $transport = false) {
-        $output = self::runAdb(self::getDeviceId($device, $transport) . "shell pm path " . $package);
-        return self::judgeOutput($output) ? substr($output[0][0], 8) : false;
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell pm path " . $package);
+        return self::judgeOutput($o) ? substr($o[0][0], 8) : false;
     }
 
     public function getCurrentActivity($device = "", $transport = false) {
-        $output = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window | grep mCurrentFocus\"");
-        if (!self::judgeOutput($output)) {
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window | grep mCurrentFocus\"");
+        if (!self::judgeOutput($o)) {
             return false;
         }
-        if (str_contains($output[0][0], "mCurrentFocus=Window")) {
-            $output = explode("/", trim(explode(" ", trim($output[0][0]))[2], "}"));
-            return array($output[0], isset($output[1]) ? $output[1] : false);
+        if (str_contains($o[0][0], "mCurrentFocus=Window")) {
+            $o = explode("/", trim(explode(" ", trim($o[0][0]))[2], "}"));
+            return array($o[0], isset($o[1]) ? $o[1] : false);
         } else {
             return array(false, false);
         }
     }
 
     public function openDocumentUI($path = "", $device = "", $transport = false) {
+        // Content workaround from https://mlgmxyysd.meowcat.org/2021/02/18/android-r-saf-data/
         return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell am start -a android.intent.action.VIEW -c android.intent.category.DEFAULT -t vnd.android.document/" . ($path === "" ? "root" : "directory -d content://com.android.externalstorage.documents/tree/primary:" . $path . "/document/primary:" . $path . "") . " com.android.documentsui/.files.FilesActivity");
     }
 
@@ -185,6 +189,8 @@ class ADB {
     public function runAdbJudge($command) {
         return self::judgeOutput(self::runAdb($command));
     }
+
+    /* Utilities */
 
     private function judgeOutput($output, $target = 0) {
         return isset($output[1]) && $output[1] === $target ? true : false;
