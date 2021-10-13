@@ -167,7 +167,7 @@ class ADB {
     public function getCurrentActivity($device = "", $transport = false) {
         $o = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window | grep mCurrentFocus\"");
         if (!self::judgeOutput($o)) {
-            return false;
+            return array(false, false);
         }
         if (str_contains($o[0][0], "mCurrentFocus=Window")) {
             $o = explode("/", trim(explode(" ", trim($o[0][0]))[2], "}"));
@@ -175,6 +175,14 @@ class ADB {
         } else {
             return array(false, false);
         }
+    }
+
+    public function getScreenState($device = "", $transport = false) {
+        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window policy | grep screenState\"");
+        if (!self::judgeOutput($o)) {
+            return false;
+        }
+        return str_contains($o[0][0], "SCREEN_STATE_ON");
     }
 
     public function openDocumentUI($path = "", $device = "", $transport = false) {
@@ -192,12 +200,12 @@ class ADB {
 
     /* Utilities */
 
-    private function judgeOutput($output, $target = 0) {
-        return isset($output[1]) && $output[1] === $target ? true : false;
+    public function getDeviceId($device = "", $transport = false) {
+        return $device === "" ? "" : ($transport ? "-t " : "-s ") . $device . " ";
     }
 
-    private function getDeviceId($device = "", $transport = false) {
-        return $device === "" ? "" : ($transport ? "-t " : "-s ") . $device . " ";
+    public function judgeOutput($output, $target = 0) {
+        return isset($output[1]) && $output[1] === $target ? true : false;
     }
 
     private function execShell($command, $raw = false) {
