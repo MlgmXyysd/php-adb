@@ -8,6 +8,7 @@
  */
 
 /**
+ * 
  * PHP Android Debug Bridge Library
  * 
  * https://github.com/MlgmXyysd/php-adb
@@ -19,6 +20,7 @@
  * 
  * All copyright in the software is not allowed to be deleted
  * or changed without permission.
+ * 
  */
 
 declare(strict_types=1);
@@ -134,6 +136,10 @@ class ADB {
     public function restartServer($force = false) {
         self::killServer($force);
         return startServer();
+    }
+
+    public function sendInput($type = "", $args = "", $device = "", $transport = false) {
+        return self::runAdb(self::getDeviceId($device, $transport) . "shell input " . $type . " " . $args);
     }
 
     public function setScreenSize($size = "reset", $device = "", $transport = false) {
