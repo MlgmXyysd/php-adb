@@ -215,7 +215,7 @@ class ADB {
 
     /* Utilities */
 
-    public function getDeviceId($device = "") {
+    public function getDeviceId($device = "", $transport = false) {
         return $device === "" ? "" : ($transport ? "-t " : "-s ") . $device . " ";
     }
 
