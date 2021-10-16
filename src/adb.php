@@ -85,7 +85,7 @@ class ADB {
             foreach ($result[0] as $key => $value) {
                 $value = preg_replace("/[ \t]+/is", " ", $value);
                 $device = explode(" ", $value);
-                $temp = array();
+                $temp = array("serial" => "", "status" => "", "transport" => "");
                 switch ($device[1]) {
                     case self::CONNECT_TYPE_DEVICE:
                     case self::CONNECT_TYPE_RECOVERY:
