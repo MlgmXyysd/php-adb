@@ -31,21 +31,21 @@ namespace MeowMobile;
  * MeowMobile/ADB
  */
 class ADB {
+    
+    const BIN_LINUX = "adb";
+    const BIN_DARWIN = "adb-darwin";
+    const BIN_WINDOWS = "adb.exe";
 
-    private const BIN_LINUX = "adb";
-    private const BIN_DARWIN = "adb-darwin";
-    private const BIN_WINDOWS = "adb.exe";
-
-    public const CONNECT_TYPE_DEVICE = "device";
-    public const CONNECT_TYPE_UNAUTHORIZED = "unauthorized";
-    public const CONNECT_TYPE_OFFLINE = "offline";
-    public const CONNECT_TYPE_SIDELOAD = "sideload";
-    public const CONNECT_TYPE_RECOVERY = "recovery";
+    const CONNECT_TYPE_DEVICE = "device";
+    const CONNECT_TYPE_RECOVERY = "recovery";
+    const CONNECT_TYPE_SIDELOAD = "sideload";
+    const CONNECT_TYPE_UNAUTHORIZED = "unauthorized";
+    const CONNECT_TYPE_OFFLINE = "offline";
 
     private $bin;
     private $devices;
 
-    function __construct() {
+    function __construct($bin_path = "") {
         switch (PHP_OS_FAMILY) {
             case "Windows":
                 $this -> bin = self::BIN_WINDOWS;
@@ -56,6 +56,15 @@ class ADB {
             default:
                 $this -> bin = self::BIN_LINUX;
         }
+		
+		if ($bin_path !== "") {
+			if (PHP_OS_FAMILY === "Windows" && substr($bin_path, -1) !== "\\") {
+                $bin_path .= DIRECTORY_SEPARATOR;
+			} else if (substr($bin_path, -1) !== "/") {
+				$bin_path .= DIRECTORY_SEPARATOR;
+            }
+            $this -> bin = $bin_path . $this -> bin;
+		}
 
         self::runAdb("root");
 
@@ -78,14 +87,14 @@ class ADB {
                 $device = explode(" ", $value);
                 $temp = array();
                 switch ($device[1]) {
-                    case "device":
-                    case "recovery":
+                    case self::CONNECT_TYPE_DEVICE:
+                    case self::CONNECT_TYPE_RECOVERY:
                         $transport = str_replace("transport_id:", "", $device[5]);
                         $temp["manufacturer"] = self::runAdb("-t " . $transport . " shell getprop ro.product.manufacturer")[0][0];
                         $temp["brand"] = self::runAdb("-t " . $transport . " shell getprop ro.product.brand")[0][0];
                         $temp["board"] = self::runAdb("-t " . $transport . " shell getprop ro.product.board")[0][0];
                         $temp["name"] = self::runAdb("-t " . $transport . " shell getprop ro.product.name")[0][0];
-                    case "sideload":
+                    case self::CONNECT_TYPE_SIDELOAD:
                         $temp["serial"] = $device[0];
                         $temp["status"] = $device[1];
                         $temp["product"] = str_replace("product:", "", $device[2]);
@@ -93,8 +102,8 @@ class ADB {
                         $temp["device"] = str_replace("device:", "", $device[4]);
                         $temp["transport"] = str_replace("transport_id:", "", $device[5]);
                         break;
-                    case "unauthorized":
-                    case "offline":
+                    case self::CONNECT_TYPE_UNAUTHORIZED:
+                    case self::CONNECT_TYPE_OFFLINE:
                         $temp["serial"] = $device[0];
                         $temp["status"] = $device[1];
                         $temp["transport"] = str_replace("transport_id:", "", $device[2]);
