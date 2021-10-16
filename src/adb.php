@@ -147,40 +147,40 @@ class ADB {
         return startServer();
     }
 
-    public function sendInput($type = "", $args = "", $device = "", $transport = false) {
-        return self::runAdb(self::getDeviceId($device, $transport) . "shell input " . $type . " " . $args);
+    public function sendInput($type = "", $args = "", $device = "") {
+        return self::runAdb($device . "shell input " . $type . " " . $args);
     }
 
-    public function setScreenSize($size = "reset", $device = "", $transport = false) {
-        return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell wm size " . $size);
+    public function setScreenSize($size = "reset", $device = "") {
+        return self::runAdbJudge($device . "shell wm size " . $size);
     }
 
-    public function getScreenSize($device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell wm size");
+    public function getScreenSize($device = "") {
+        $o = self::runAdb($device . "shell wm size");
         return self::judgeOutput($o) ? array(str_replace("Physical size: ", "", $o[0][0]), isset($output[0][1]) ? str_replace("Override size: ", "", $o[0][1]) : $physical) : false;
     }
 
-    public function setScreenDensity($size = "reset", $device = "", $transport = false) {
-        return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell wm density " . $size);
+    public function setScreenDensity($size = "reset", $device = "") {
+        return self::runAdbJudge($device . "shell wm density " . $size);
     }
 
-    public function getScreenDensity($device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell wm density");
+    public function getScreenDensity($device = "") {
+        $o = self::runAdb($device . "shell wm density");
         return self::judgeOutput($o) ? array(str_replace("Physical density: ", "", $o[0][0]), isset($o[0][1]) ? str_replace("Override density: ", "", $o[0][1]) : $physical) : false;
     }
 
-    public function getScreenshotPNG($device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "exec-out screencap -p", true);
+    public function getScreenshotPNG($device = "") {
+        $o = self::runAdb($device . "exec-out screencap -p", true);
         return self::judgeOutput($o) ? $o[0] : false;
     }
 
-    public function getPackage($package, $device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell pm path " . $package);
+    public function getPackage($package, $device = "") {
+        $o = self::runAdb($device . "shell pm path " . $package);
         return self::judgeOutput($o) ? substr($o[0][0], 8) : false;
     }
 
-    public function getCurrentActivity($device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window | grep mCurrentFocus\"");
+    public function getCurrentActivity($device = "") {
+        $o = self::runAdb($device . "shell \"dumpsys window | grep mCurrentFocus\"");
         if (!self::judgeOutput($o)) {
             return array(false, false);
         }
@@ -192,17 +192,17 @@ class ADB {
         }
     }
 
-    public function getScreenState($device = "", $transport = false) {
-        $o = self::runAdb(self::getDeviceId($device, $transport) . "shell \"dumpsys window policy | grep screenState\"");
+    public function getScreenState($device = "") {
+        $o = self::runAdb($device . "shell \"dumpsys window policy | grep screenState\"");
         if (!self::judgeOutput($o)) {
             return false;
         }
         return str_contains($o[0][0], "SCREEN_STATE_ON");
     }
 
-    public function openDocumentUI($path = "", $device = "", $transport = false) {
+    public function openDocumentUI($path = "", $device = "") {
         // Content workaround from https://mlgmxyysd.meowcat.org/2021/02/18/android-r-saf-data/
-        return self::runAdbJudge(self::getDeviceId($device, $transport) . "shell am start -a android.intent.action.VIEW -c android.intent.category.DEFAULT -t vnd.android.document/" . ($path === "" ? "root" : "directory -d content://com.android.externalstorage.documents/tree/primary:" . $path . "/document/primary:" . $path . "") . " com.android.documentsui/.files.FilesActivity");
+        return self::runAdbJudge($device . "shell am start -a android.intent.action.VIEW -c android.intent.category.DEFAULT -t vnd.android.document/" . ($path === "" ? "root" : "directory -d content://com.android.externalstorage.documents/tree/primary:" . $path . "/document/primary:" . $path . "") . " com.android.documentsui/.files.FilesActivity");
     }
 
     public function runAdb($command, $raw = false) {
@@ -215,7 +215,7 @@ class ADB {
 
     /* Utilities */
 
-    public function getDeviceId($device = "", $transport = false) {
+    public function getDeviceId($device = "") {
         return $device === "" ? "" : ($transport ? "-t " : "-s ") . $device . " ";
     }
 
