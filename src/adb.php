@@ -13,7 +13,10 @@
  * 
  * https://github.com/MlgmXyysd/php-adb
  * 
- * Simple wrapper of Android Debug Bridge for PHP.
+ * Simple wrapper of Android Debug Bridge for PHP. 
+ * 
+ * Environment requirement:
+ *   - PHP
  * 
  * @author MlgmXyysd
  * @version 1.0
