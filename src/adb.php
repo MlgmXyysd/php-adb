@@ -42,6 +42,7 @@ class ADB {
     const CONNECT_TYPE_DEVICE = "device";
     const CONNECT_TYPE_RECOVERY = "recovery";
     const CONNECT_TYPE_SIDELOAD = "sideload";
+    const CONNECT_TYPE_RESCUE = "rescue";
     const CONNECT_TYPE_UNAUTHORIZED = "unauthorized";
     const CONNECT_TYPE_OFFLINE = "offline";
 
@@ -98,6 +99,7 @@ class ADB {
                         $temp["board"] = self::runAdb("-t " . $transport . " shell getprop ro.product.board")[0][0];
                         $temp["name"] = self::runAdb("-t " . $transport . " shell getprop ro.product.name")[0][0];
                     case self::CONNECT_TYPE_SIDELOAD:
+                    case self::CONNECT_TYPE_RESCUE:
                         $temp["serial"] = $device[0];
                         $temp["status"] = $device[1];
                         $temp["product"] = str_replace("product:", "", $device[2]);
