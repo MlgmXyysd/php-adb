@@ -210,6 +210,10 @@ class ADB {
         return self::runAdbJudge($device . "shell am start -a android.intent.action.VIEW -c android.intent.category.DEFAULT -t vnd.android.document/" . ($path === "" ? "root" : "directory -d content://com.android.externalstorage.documents/tree/primary:" . $path . "/document/primary:" . $path . "") . " com.android.documentsui/.files.FilesActivity");
     }
 
+    public function clearLogcat() {
+        return self::runAdb($device . "logcat -c");
+    }
+
     public function runAdb($command, $raw = false) {
         return self::execShell($this -> bin . " "  . $command, $raw);
     }
