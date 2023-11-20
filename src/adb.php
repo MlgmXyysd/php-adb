@@ -19,7 +19,7 @@
  *   - PHP
  * 
  * @author MlgmXyysd
- * @version 1.1
+ * @version 1.2
  * 
  * All copyright in the software is not allowed to be deleted
  * or changed without permission.
@@ -190,11 +190,13 @@ class ADB {
             return array(false, false);
         }
         if (str_contains($o[0][0], "mCurrentFocus=Window")) {
-            $o = explode("/", trim(explode(" ", trim($o[0][0]))[2], "}"));
-            return array($o[0], isset($o[1]) ? $o[1] : false);
-        } else {
-            return array(false, false);
+            if (preg_match("/Window\{(.*)\}/", $o[0][0], $matches)) {
+				$matches = explode(" ", $matches[1]);
+				$o = explode("/", $matches[count($matches) - 1]);
+				return array($o[0], isset($o[1]) ? $o[1] : false);
+			}
         }
+        return array(false, false);
     }
 
     public function getScreenState($device = "") {
