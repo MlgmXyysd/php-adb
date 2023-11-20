@@ -67,7 +67,7 @@ class ADB {
 			} else if (substr($bin_path, -1) !== "/") {
 				$bin_path .= DIRECTORY_SEPARATOR;
             }
-            $this -> bin = $bin_path . $this -> bin;
+            $this -> bin = "\"" . $bin_path . $this -> bin . "\"";
 		}
 
         self::runAdb("root");
