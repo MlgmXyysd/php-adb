@@ -19,7 +19,7 @@
  *   - PHP
  * 
  * @author MlgmXyysd
- * @version 1.0
+ * @version 1.1
  * 
  * All copyright in the software is not allowed to be deleted
  * or changed without permission.
@@ -46,7 +46,7 @@ class ADB {
     const CONNECT_TYPE_UNAUTHORIZED = "unauthorized";
     const CONNECT_TYPE_OFFLINE = "offline";
 
-    private $bin;
+    public $bin;
     private $devices;
 
     function __construct($bin_path = "") {
