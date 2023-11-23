@@ -62,9 +62,8 @@ class ADB {
         }
 		
 		if ($bin_path !== "") {
-			if (PHP_OS_FAMILY === "Windows" && substr($bin_path, -1) !== "\\") {
-                $bin_path .= DIRECTORY_SEPARATOR;
-			} else if (substr($bin_path, -1) !== "/") {
+			$sep = PHP_OS_FAMILY === "Windows" ? "\\" : "/";
+			if (substr($bin_path, -1) !== $sep) {
 				$bin_path .= DIRECTORY_SEPARATOR;
             }
             $this -> bin = "\"" . $bin_path . $this -> bin . "\"";
@@ -212,7 +211,7 @@ class ADB {
         return self::runAdbJudge($device . "shell am start -a android.intent.action.VIEW -c android.intent.category.DEFAULT -t vnd.android.document/" . ($path === "" ? "root" : "directory -d content://com.android.externalstorage.documents/tree/primary:" . $path . "/document/primary:" . $path . "") . " com.android.documentsui/.files.FilesActivity");
     }
 
-    public function clearLogcat() {
+    public function clearLogcat($device = "") {
         return self::runAdb($device . "logcat -c");
     }
 
